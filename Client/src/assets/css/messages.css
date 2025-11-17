@@ -1,0 +1,13 @@
+* {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.ce-chat-title-text, .ce-chat-subtitle-text  {
+    color: #027B8B;
+}
+.ce-message-date-text {
+    color:  #a0e2eb
+}
+.ce-send-message-button {
+    background-color: #027B8B;
+}
