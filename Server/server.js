@@ -1,13 +1,14 @@
 const express = require("express")
 const dotenv = require('dotenv').config()
 const cors = require('cors')
-const { mongoose } = require('mongoose')
+const mongoose = require('mongoose')
 const cookieParser = require('cookie-parser')
 const app = express()
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'http://192.168.0.167:5173'
+  'http://127.0.0.1:5173',
+  'http://192.168.1.24:5173'
 ];
 
 app.use(cors({

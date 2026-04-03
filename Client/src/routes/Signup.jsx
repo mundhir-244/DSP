@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { UserContext } from '../../context/userContext'
+import { useContext, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { UserContext } from '../../context/userContext'
 import Navbar from '../components/Navbar'
 import SignupForm from '../components/SignupForm'
 
@@ -17,11 +17,12 @@ const Signup = () => {
   }, [user, loading, navigate]);
 
   return (
-    <div className='flex w-full justify-center'>
+    <div className='flex w-full h-screen justify-evenly items-center flex-col-reverse xl:flex-row overflow-hidden'>
         <Navbar />
-        <SignupForm />
+        <div className='w-full flex justify-center items-center h-full xl:pb-[15rem]'>
+          <SignupForm />
+        </div>
     </div>
-      
   )
 }
 

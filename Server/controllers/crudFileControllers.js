@@ -280,9 +280,98 @@ const editProfile = async (req, res) => {
   }
 }
 
+// Get all reported posts
+const getReportedPosts = async (req, res) => {
+  try {
+    const posts = await PostModel.find({ reported: true })
+      .sort({ 'reports.length': -1 })
+      .populate('userId', 'userName profilePicUrl')
+      .lean()
+
+    return res.json(posts)
+  } catch (error) {
+    console.error('Error fetching reported posts:', error)
+    return res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+// Report a post
+const reportPost = async (req, res) => {
+  try {
+    const { postId } = req.params
+    const { userId, reason } = req.body
+
+    const post = await PostModel.findById(postId)
+    if (!post) return res.status(404).json({ error: 'Post not found' })
+
+    const alreadyReported = post.reports?.some(r => r.userId?.toString() === userId)
+    if (alreadyReported) return res.status(400).json({ error: 'You already reported this post' })
+
+    post.reports.push({ userId, reason })
+    post.reported = true
+    post.reportReason = reason
+    await post.save()
+
+    return res.json({ message: 'Post reported' })
+  } catch (error) {
+    console.error('Error reporting post:', error)
+    return res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+// Approve post (dismiss reports)
+const approvePost = async (req, res) => {
+  try {
+    const { postId } = req.params
+
+    const post = await PostModel.findByIdAndUpdate(
+      postId,
+      { reported: false, reports: [], reportReason: '' },
+      { new: true }
+    )
+    if (!post) return res.status(404).json({ error: 'Post not found' })
+
+    return res.json({ message: 'Post approved' })
+  } catch (error) {
+    console.error('Error approving post:', error)
+    return res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
+
+// Moderator delete post
+const moderatorDeletePost = async (req, res) => {
+  try {
+    const { postId } = req.params
+
+    // Fetch post first to get the URL for Firebase deletion
+    const post = await PostModel.findById(postId)
+    if (!post) return res.status(404).json({ error: 'Post not found' })
+
+    // Delete from Firebase Storage
+    try {
+      const bucket = admin.storage().bucket()
+      const decodeUrl = decodeURIComponent(post.url)
+      const filePathMatch = decodeUrl.match(/\/o\/(.+)\?alt=media/)
+      if (filePathMatch) {
+        const filePath = filePathMatch[1]
+        await bucket.file(filePath).delete()
+      }
+    } catch (firebaseError) {
+      console.error('Firebase deletion failed:', firebaseError.message)
+      // Continue to delete from MongoDB even if Firebase fails
+    }
+
+    await PostModel.findByIdAndDelete(postId)
+    return res.json({ message: 'Post deleted by moderator' })
+
+  } catch (error) {
+    console.error('Error in moderator delete:', error)
+    return res.status(500).json({ error: 'Internal Server Error' })
+  }
+}
 
 module.exports = {
-  upload: upload.single("filename"), 
+  upload: upload.single("filename"),
   handleUpload,
   getPosts,
   addComment,
@@ -290,5 +379,9 @@ module.exports = {
   uploadFile,
   getUsersPosts,
   getUser,
-  deletePost
+  deletePost,
+  getReportedPosts,  
+  reportPost,        
+  approvePost,       
+  moderatorDeletePost
 }

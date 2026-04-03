@@ -1,9 +1,7 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { useState } from 'react'
 import axios from 'axios'
+import { useState } from 'react'
 import { toast } from 'react-hot-toast'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const SignupForm = () => {
   const navigate = useNavigate()
@@ -15,6 +13,7 @@ const SignupForm = () => {
 
   const registerUser = async (e) => {
     e.preventDefault()
+    alert('register user')
     const { userName, email, password } = data
     try {
       const { data } = await axios.post('/register', {

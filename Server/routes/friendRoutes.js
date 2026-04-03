@@ -8,7 +8,8 @@ const { acceptFriendRequest } = require('../controllers/friendControllers')
 //middleware
 const allowedOrigins = [
   'http://localhost:5173',
-  'http://192.168.0.167:5173'
+  'http://127.0.0.1:5173',
+  'http://192.168.1.24:5173'
 ];
 
 router.use(cors({

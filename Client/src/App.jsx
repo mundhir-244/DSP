@@ -4,7 +4,7 @@ import { UserContext } from '../context/userContext';
 import GetPosts from './components/GetPosts';
 import Navbar from './components/Navbar';
 
-axios.defaults.baseURL = 'http://192.168.0.167:3000';
+axios.defaults.baseURL = 'http://192.168.0.135:3000';
 axios.defaults.withCredentials = true;
 
 function App() {
